@@ -1,6 +1,7 @@
 'use strict'
 
-import { app, protocol, BrowserWindow } from 'electron'
+import { createSocket } from 'dgram'
+import { app, protocol, BrowserWindow, ipcMain } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
 const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -79,3 +80,12 @@ if (isDevelopment) {
     })
   }
 }
+
+/* socket udp */
+
+const socket = createSocket('udp4');
+socket.on('message', function(msg, rinfo) {
+  console.log({message: msg.toString(), data: rinfo})
+  ipcMain.emit('message', {message: msg.toString(), data: rinfo})
+});
+socket.bind(8080);
